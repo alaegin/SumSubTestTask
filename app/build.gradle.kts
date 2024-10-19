@@ -52,6 +52,10 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintLayout)
 
+    // Coroutines
+    implementation(libs.coroutines.core)
+    implementation(libs.coroutines.guava)
+
     // Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
@@ -61,6 +65,8 @@ dependencies {
     implementation(libs.camerax.camera2)
     implementation(libs.camerax.lifecycle)
     implementation(libs.camerax.view)
+    implementation(libs.camerax.mlkit.vision)
+    implementation(libs.mlkit.faceDetection)
 
     // Utils
     implementation(libs.timber)
