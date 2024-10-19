@@ -1,3 +1,7 @@
 <resources>
+
     <string name="app_name">SumSub Test Task</string>
+
+    <string name="camera_permissions_not_granted_message">Camera permissions not granted</string>
+    <string name="camera_permissions_not_granted_button_grant">Grant</string>
 </resources>

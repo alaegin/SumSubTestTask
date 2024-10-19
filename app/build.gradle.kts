@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.hilt)
+    kotlin("kapt")
 }
 
 android {
@@ -44,7 +46,15 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.lifecycle.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.constraintLayout)
+
+    implementation(libs.timber)
+
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
 
     implementation(libs.camerax.core)
     implementation(libs.camerax.camera2)
@@ -52,4 +62,8 @@ dependencies {
     implementation(libs.camerax.view)
 
     implementation(libs.viewBindingDelegate)
+}
+
+kapt {
+    correctErrorTypes = true
 }
