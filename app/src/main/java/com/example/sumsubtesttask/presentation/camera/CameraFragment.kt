@@ -69,6 +69,10 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         viewBinding.layoutPermissionsNotGranted.buttonGrant.setOnClickListener {
             viewModel.onGrantPermissionsClicked()
         }
+
+        viewBinding.buttonToggleLens.setOnClickListener {
+            viewModel.onToggleLensClicked()
+        }
     }
 
     private fun render(state: CameraViewState) {
@@ -79,6 +83,8 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             state.screenState == CameraViewState.ScreenState.CAMERA_PREVIEW
 
         viewBinding.layoutCameraPreview.viewFaceDetectionOverlay.setFaces(state.detectedFaces)
+
+        viewBinding.buttonToggleLens.isVisible = state.isCameraLensToggleVisible
     }
 
     private fun handleSideEffect(sideEffect: CameraSideEffect) {
@@ -86,6 +92,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             CameraSideEffect.OpenAppSystemSettings -> openAppSystemSettings()
             CameraSideEffect.RequestPermissions -> requestPermissions()
             is CameraSideEffect.InitCamera -> startCamera(sideEffect.analyzer)
+            is CameraSideEffect.ToggleLens -> toggleLens(sideEffect.isFacingFront)
         }
     }
 
@@ -110,6 +117,13 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             cameraManager.setImageAnalyzer(analyzer)
             cameraManager.startCamera()
             viewModel.onCameraCapabilitiesReceived(cameraManager.getCapabilities())
+        }
+    }
+
+    private fun toggleLens(isFacingFront: Boolean) {
+        lifecycleScope.launch {
+            cameraManager.setCameraFacing(isFacingFront)
+            viewBinding.layoutCameraPreview.viewFaceDetectionOverlay.setFaces(emptyList())
         }
     }
 }

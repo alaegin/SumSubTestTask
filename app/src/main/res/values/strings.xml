@@ -4,4 +4,7 @@
 
     <string name="camera_permissions_not_granted_message">Camera permissions not granted</string>
     <string name="camera_permissions_not_granted_button_grant">Grant</string>
+
+    <string name="camera_toggle_lens">Toggle camera lens</string>
+
 </resources>

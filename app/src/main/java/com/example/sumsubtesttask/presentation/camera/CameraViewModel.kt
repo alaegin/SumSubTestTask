@@ -55,7 +55,13 @@ class CameraViewModel @Inject constructor(
     fun onCameraCapabilitiesReceived(capabilities: CameraManager.Capabilities) {
         intent {
             Timber.d("onCameraCapabilitiesReceived, capabilities: $capabilities")
-            // TODO
+
+            reduce {
+                state.copy(
+                    isFrontCameraSupported = capabilities.hasFrontCamera,
+                    isBackCameraSupported = capabilities.hasBackCamera,
+                )
+            }
         }
     }
 
@@ -67,10 +73,22 @@ class CameraViewModel @Inject constructor(
         }
     }
 
+    fun onToggleLensClicked() {
+        intent {
+            Timber.d("onToggleLensClicked")
+
+            reduce {
+                state.copy(cameraFacingFront = !state.cameraFacingFront)
+            }
+
+            postSideEffect(CameraSideEffect.ToggleLens(state.cameraFacingFront))
+        }
+    }
+
     private suspend fun handlePermissionsStatus(isGranted: Boolean) = subIntent {
         Timber.d("handlePermissionsStatus, isGranted: $isGranted")
 
-        if (state.screenState != CameraViewState.ScreenState.CAMERA_PREVIEW && isGranted) {
+        if (isGranted) {
             postSideEffect(CameraSideEffect.InitCamera(faceDetectionAnalyzerWrapper.analyzer))
         }
 

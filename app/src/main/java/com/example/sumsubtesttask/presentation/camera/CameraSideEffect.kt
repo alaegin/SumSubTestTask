@@ -18,4 +18,9 @@ sealed interface CameraSideEffect {
      * Opens the camera.
      */
     data class InitCamera(val analyzer: ImageAnalysis.Analyzer) : CameraSideEffect
+
+    /**
+     * Toggles the camera lens facing (front/back).
+     */
+    data class ToggleLens(val isFacingFront: Boolean) : CameraSideEffect
 }

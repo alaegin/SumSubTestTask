@@ -23,45 +23,55 @@ class CameraManager @AssistedInject constructor(
     private val context: Context,
 ) {
 
-    private val controller = LifecycleCameraController(context)
+    private val cameraController = LifecycleCameraController(context)
     private val analyzerExecutor = Dispatchers.Default.asExecutor()
+    private var cameraStarted = false
 
-    suspend fun startCamera() {
-        previewView.controller = controller
-        setCameraFacing(isFront = true)
-        controller.bindToLifecycle(lifecycleOwner)
+    suspend fun startCamera() = awaitCamera {
+        if (cameraStarted) {
+            return
+        }
+
+        val capabilities = getCapabilities()
+        setCameraFacing(isFront = capabilities.hasFrontCamera)
+
+        previewView.controller = cameraController
+        cameraController.bindToLifecycle(lifecycleOwner)
+
+        cameraStarted = true
     }
 
-    suspend fun setImageAnalyzer(analyzer: ImageAnalysis.Analyzer) {
-        awaitCamera()
-        controller.imageAnalysisBackpressureStrategy = ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
-        controller.setImageAnalysisAnalyzer(analyzerExecutor, analyzer)
+    suspend fun setImageAnalyzer(analyzer: ImageAnalysis.Analyzer) = awaitCamera {
+        cameraController.imageAnalysisBackpressureStrategy = ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
+        cameraController.setImageAnalysisAnalyzer(analyzerExecutor, analyzer)
     }
 
     fun release() {
         previewView.controller = null
-        controller.unbind()
+        cameraController.unbind()
     }
 
-    suspend fun setCameraFacing(isFront: Boolean) {
-        awaitCamera()
-        controller.cameraSelector = if (isFront) {
+    suspend fun setCameraFacing(isFront: Boolean) = awaitCamera {
+        cameraController.cameraSelector = if (isFront) {
             CameraSelector.DEFAULT_FRONT_CAMERA
         } else {
             CameraSelector.DEFAULT_BACK_CAMERA
         }
     }
 
-    suspend fun getCapabilities(): Capabilities {
-        awaitCamera()
+    suspend fun getCapabilities(): Capabilities = awaitCamera {
         return Capabilities(
-            hasFrontCamera = controller.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA),
-            hasBackCamera = controller.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA),
+            hasFrontCamera = cameraController.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA),
+            hasBackCamera = cameraController.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA),
         )
     }
 
-    private suspend fun awaitCamera() {
-        controller.initializationFuture.await()
+    private suspend inline fun <T> awaitCamera(block: () -> T): T {
+        if (!cameraController.initializationFuture.isDone) {
+            cameraController.initializationFuture.await()
+        }
+
+        return block()
     }
 
     @AssistedFactory
