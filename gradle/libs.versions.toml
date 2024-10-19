@@ -7,6 +7,8 @@ androidx-core-ktx = "androidx.core:core-ktx:1.13.1"
 androidx-activity-ktx = "androidx.activity:activity-ktx:1.9.3"
 androidx-appcompat = "androidx.appcompat:appcompat:1.7.0"
 
+viewBindingDelegate = "com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9"
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
