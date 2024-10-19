@@ -1,0 +1,13 @@
+[versions]
+agp = "8.7.1"
+kotlin = "2.0.21"
+
+[libraries]
+androidx-core-ktx = "androidx.core:core-ktx:1.13.1"
+androidx-activity-ktx = "androidx.activity:activity-ktx:1.9.3"
+androidx-appcompat = "androidx.appcompat:appcompat:1.7.0"
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+
