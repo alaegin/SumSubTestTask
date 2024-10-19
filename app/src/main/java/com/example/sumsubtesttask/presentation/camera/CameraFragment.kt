@@ -2,8 +2,9 @@ package com.example.sumsubtesttask.presentation.camera
 
 import android.Manifest
 import android.os.Bundle
+import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -11,12 +12,12 @@ import com.example.sumsubtesttask.R
 import com.example.sumsubtesttask.databinding.FragmentCameraBinding
 import com.example.sumsubtesttask.util.extension.isPermissionGranted
 import com.example.sumsubtesttask.util.extension.openAppSystemSettings
-import dagger.hilt.EntryPoint
-import timber.log.Timber
+import dagger.hilt.android.AndroidEntryPoint
+import org.orbitmvi.orbit.viewmodel.observe
 
 private const val CAMERA_PERMISSION = Manifest.permission.CAMERA
 
-@EntryPoint
+@AndroidEntryPoint
 class CameraFragment : Fragment(R.layout.fragment_camera) {
 
     private val viewModel: CameraViewModel by viewModels()
@@ -30,19 +31,38 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        viewModel.onScreenCreated()
+    }
 
-        if (checkPermissionGranted()) {
-            onPermissionsGranted()
-        } else {
-            requestPermissions()
-        }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initViews()
+        viewModel.observe(lifecycleOwner = viewLifecycleOwner, state = ::render, sideEffect = ::handleSideEffect)
     }
 
     override fun onResume() {
         super.onResume()
+        viewModel.onScreenResumed(isPermissionGranted = checkPermissionGranted())
+    }
 
-        if (checkPermissionGranted()) {
-            onPermissionsGranted()
+    private fun initViews() {
+        viewBinding.layoutPermissionsNotGranted.buttonGrant.setOnClickListener {
+            viewModel.onGrantPermissionsClicked()
+        }
+    }
+
+    private fun render(state: CameraViewState) {
+        viewBinding.layoutPermissionsNotGranted.root.isVisible =
+            state.screenState == CameraViewState.ScreenState.PERMISSIONS_REQUEST
+
+        viewBinding.viewCameraPreview.isVisible =
+            state.screenState == CameraViewState.ScreenState.CAMERA_PREVIEW
+    }
+
+    private fun handleSideEffect(sideEffect: CameraSideEffect) {
+        when (sideEffect) {
+            CameraSideEffect.OpenAppSystemSettings -> openAppSystemSettings()
+            CameraSideEffect.RequestPermissions -> requestPermissions()
         }
     }
 
@@ -50,32 +70,12 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         activityResultLauncher.launch(CAMERA_PERMISSION)
     }
 
+    private fun openAppSystemSettings() {
+        requireContext().openAppSystemSettings()
+    }
+
     private fun handlePermissionsRequestResult(isGranted: Boolean) {
-        if (isGranted) {
-            onPermissionsGranted()
-        } else {
-            onPermissionsDenied()
-        }
-    }
-
-    private fun onPermissionsGranted() {
-        Timber.d("Permissions granted")
-        // TODO Notify ViewModel
-
-        viewBinding.layoutPermissionsNotGranted.root.isGone = true
-
-        // TODO
-    }
-
-    private fun onPermissionsDenied() {
-        Timber.d("Permissions denied")
-        // TODO Notify ViewModel
-
-        viewBinding.layoutPermissionsNotGranted.apply {
-            root.isGone = false
-            // TODO Notify ViewModel
-            buttonGrant.setOnClickListener { requireContext().openAppSystemSettings() }
-        }
+        viewModel.onPermissionResult(isGranted)
     }
 
     private fun checkPermissionGranted(): Boolean {

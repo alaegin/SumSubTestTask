@@ -21,6 +21,8 @@ camerax-view = { module = "androidx.camera:camera-view", version.ref = "camerax"
 
 timber = "com.jakewharton.timber:timber:5.0.1"
 
+orbitmvi = "org.orbit-mvi:orbit-viewmodel:9.0.0"
+
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 

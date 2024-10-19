@@ -44,6 +44,7 @@ android {
 }
 
 dependencies {
+    // AndroidX
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.fragment.ktx)
@@ -51,16 +52,19 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintLayout)
 
-    implementation(libs.timber)
-
+    // Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
 
+    // CameraX
     implementation(libs.camerax.core)
     implementation(libs.camerax.camera2)
     implementation(libs.camerax.lifecycle)
     implementation(libs.camerax.view)
 
+    // Utils
+    implementation(libs.timber)
+    implementation(libs.orbitmvi)
     implementation(libs.viewBindingDelegate)
 }
 
