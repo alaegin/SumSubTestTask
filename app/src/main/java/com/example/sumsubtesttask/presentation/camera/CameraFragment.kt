@@ -31,7 +31,12 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     @Inject
     lateinit var cameraManagerFactory: CameraManager.Factory
 
-    private val cameraManager by lazy { cameraManagerFactory.create(viewBinding.viewCameraPreview, viewLifecycleOwner) }
+    private val cameraManager by lazy {
+        cameraManagerFactory.create(
+            previewView = viewBinding.layoutCameraPreview.viewCameraPreview,
+            lifecycleOwner = viewLifecycleOwner,
+        )
+    }
 
     private val activityResultLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -70,8 +75,10 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         viewBinding.layoutPermissionsNotGranted.root.isVisible =
             state.screenState == CameraViewState.ScreenState.PERMISSIONS_REQUEST
 
-        viewBinding.viewCameraPreview.isVisible =
+        viewBinding.layoutCameraPreview.root.isVisible =
             state.screenState == CameraViewState.ScreenState.CAMERA_PREVIEW
+
+        viewBinding.layoutCameraPreview.viewFaceDetectionOverlay.setFaces(state.detectedFaces)
     }
 
     private fun handleSideEffect(sideEffect: CameraSideEffect) {

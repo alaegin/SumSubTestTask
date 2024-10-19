@@ -89,7 +89,7 @@ class CameraViewModel @Inject constructor(
         repeatOnSubscription {
             faceDetectionAnalyzerWrapper
                 .detectedFacesFlow
-                .sample(100.milliseconds)
+                .sample(50.milliseconds)
                 .onEach { Timber.v("${it.size} faces detected") }
                 .collect { faces ->
                     reduce { state.copy(detectedFaces = faces) }
