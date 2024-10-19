@@ -2,18 +2,21 @@ package com.example.sumsubtesttask.domain.face_detection
 
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.mlkit.vision.MlKitAnalyzer
+import com.example.sumsubtesttask.di.DefaultExecutor
 import com.example.sumsubtesttask.domain.face_detection.model.DetectedFace
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import timber.log.Timber
+import java.util.concurrent.Executor
 import javax.inject.Inject
 
-class FaceDetectionAnalyzerWrapperImpl @Inject constructor() : FaceDetectionAnalyzerWrapper {
+class FaceDetectionAnalyzerWrapperImpl @Inject constructor(
+    @DefaultExecutor
+    private val executor: Executor,
+) : FaceDetectionAnalyzerWrapper {
 
     override val detectedFacesFlow: MutableSharedFlow<List<DetectedFace>> = MutableSharedFlow(
         extraBufferCapacity = 1,
@@ -24,7 +27,7 @@ class FaceDetectionAnalyzerWrapperImpl @Inject constructor() : FaceDetectionAnal
         MlKitAnalyzer(
             listOf(detector),
             ImageAnalysis.COORDINATE_SYSTEM_VIEW_REFERENCED,
-            Dispatchers.Default.asExecutor(),
+            executor,
         ) { result ->
             result.getValue(detector)?.let { results ->
                 handleFaceDetectionResults(results)

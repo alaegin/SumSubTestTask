@@ -6,13 +6,13 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.lifecycle.LifecycleOwner
+import com.example.sumsubtesttask.di.DefaultExecutor
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.guava.await
+import java.util.concurrent.Executor
 
 class CameraManager @AssistedInject constructor(
     @Assisted
@@ -21,10 +21,11 @@ class CameraManager @AssistedInject constructor(
     private val lifecycleOwner: LifecycleOwner,
     @ApplicationContext
     private val context: Context,
+    @DefaultExecutor
+    private val executor: Executor,
 ) {
 
     private val cameraController = LifecycleCameraController(context)
-    private val analyzerExecutor = Dispatchers.Default.asExecutor()
     private var cameraStarted = false
 
     suspend fun startCamera() = awaitCamera {
@@ -43,7 +44,7 @@ class CameraManager @AssistedInject constructor(
 
     suspend fun setImageAnalyzer(analyzer: ImageAnalysis.Analyzer) = awaitCamera {
         cameraController.imageAnalysisBackpressureStrategy = ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
-        cameraController.setImageAnalysisAnalyzer(analyzerExecutor, analyzer)
+        cameraController.setImageAnalysisAnalyzer(executor, analyzer)
     }
 
     fun release() {
