@@ -63,7 +63,7 @@ class FaceDetectionOverlay @JvmOverloads constructor(
         val facesChanged = faces != this.faceRectangles
         this.faceRectangles = faces.map { it.rect.toRectF() }
 
-        if (facesChanged && faces.isNotEmpty()) {
+        if (facesChanged) {
             invalidate()
         }
     }
