@@ -23,8 +23,9 @@ class CameraViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        Timber.d("onCleared")
         super.onCleared()
+        Timber.d("onCleared")
+
         faceDetectionAnalyzerWrapper.release()
         container.cancel()
     }
@@ -48,6 +49,7 @@ class CameraViewModel @Inject constructor(
     fun onPermissionResult(isGranted: Boolean) {
         intent {
             Timber.d("onPermissionResult, isGranted: $isGranted")
+
             handlePermissionsStatus(isGranted)
         }
     }
